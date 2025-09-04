@@ -1,28 +1,28 @@
 def dfs(maze, start, end):
-    stack = [start] # Initialize stack with start position
-    visited = set() # Track visited positions
+    stack = [(start, [start])]  # Each element is (position, path_so_far)
+    visited = set()
 
     while stack:
-        position = stack.pop() # Get current position
+        position, path = stack.pop()
         x, y = position
 
-        # Check if we've reached the end
         if position == end:
-            return True
+            return path  # Return the successful path
 
-        # Mark the current cell as visited
-        visited.add((x, y))
+        visited.add(position)
 
         # Explore neighbors (up, down, left, right)
         for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
             new_x, new_y = x + dx, y + dy
+            new_pos = (new_x, new_y)
 
-            # Check bounds and if the cell is already visited or is a wall
+            # Check bounds, walls, and visited
             if (0 <= new_x < len(maze) and 0 <= new_y < len(maze[0]) and
-                    maze[new_x][new_y] == 0 and (new_x, new_y) not in visited):
-                stack.append((new_x, new_y))
+                maze[new_x][new_y] == 0 and new_pos not in visited):
+                stack.append((new_pos, path + [new_pos]))
 
-    return False # Return False if no path is found
+    return None  # No path found
+
 
 # Example maze: 0 -> open path, 1 -> wall
 maze = [
@@ -33,9 +33,12 @@ maze = [
     [0, 0, 0, 0, 0]
 ]
 
-# Start and end positions
-start = (0, 0)
-end = (4, 4)
+start = (0, 2)
+end = (3, 4)
 
-# Solve the maze
-print(dfs(maze, start, end)) # Output: True
+path = dfs(maze, start, end)
+if path:
+    print("Path found:", path)
+else:
+    print("No path exists")
+
