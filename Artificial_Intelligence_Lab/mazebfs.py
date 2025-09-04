@@ -1,34 +1,44 @@
-from queue import Queue
+from collections import deque
 
 def bfs(maze, start, end):
-    queue = Queue()
-    queue.put([start])  # Enqueue the start position
+    # Directions: up, right, down, left
+    directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+    queue = deque([start])  # Queue for BFS
+    visited = set(start)    # Keep track of visited cells
 
-    while not queue.empty():
-        path = queue.get()  # Dequeue the path
-        x, y = path[-1]     # Current position is the last element of the path
+    while queue:
+        current = queue.popleft()
+        if current == end:
+            return True  # Path found to exit
 
-        if (x, y) == end:
-            return path  # Return the path if end is reached
+        for direction in directions:
+            # Calculate the next cell's position
+            next_cell = (current[0] + direction[0], current[1] + direction[1])
 
-        for dx, dy in [(0,1), (1,0), (-1,0), (0,-1)]:  # Possible movements
-            next_x, next_y = x + dx, y + dy
-            if maze[next_x][next_y] != '#' and (next_x, next_y) not in path:
-                new_path = list(path)
-                new_path.append((next_x, next_y))
-                queue.put(new_path)  # Enqueue the new path
+            # Check if the next cell is within the maze and not a wall
+            if (0 <= next_cell[0] < len(maze) and
+                    0 <= next_cell[1] < len(maze[0]) and
+                    maze[next_cell[0]][next_cell[1]] != '#' and
+                    next_cell not in visited):
+                queue.append(next_cell)
+                visited.add(next_cell)
 
-# Example usage
+    return False  # No path found
+
+# Example maze where '#' is a wall, 'S' is start, and 'E' is end
 maze = [
-    ['#', '#', '#', '#', '#', '#'],
-    ['#', 'S', ' ', ' ', ' ', '#'],
-    ['#', ' ', '#', ' ', '#', '#'],
-    ['#', ' ', '#', ' ', ' ', '#'],
-    ['#', ' ', ' ', ' ', 'E', '#'],
-    ['#', '#', '#', '#', '#', '#']
+    ['S', '.', '.', '#', '.', '.', '.'],
+    ['.', '#', '.', '#', '.', '#', '.'],
+    ['.', '#', '.', '.', '.', '.', '.'],
+    ['.', '.', '#', '#', '#', '.', '.'],
+    ['.', '#', '.', '.', '.', '#', '.'],
+    ['.', '#', '#', '#', '.', '#', '.'],
+    ['.', '.', '.', '.', '.', '.', 'E'],
 ]
-start = (1, 1)  # Start position (S)
-end = (4, 4)    # End position (E)
-path = bfs(maze, start, end)
-print(path)
 
+start = (0, 0)  # Starting position
+end = (6, 6)    # Ending position (exit)
+
+# Run BFS to find the path
+path_exists = bfs(maze, start, end)
+print("Path found!" if path_exists else "No path exists.")
