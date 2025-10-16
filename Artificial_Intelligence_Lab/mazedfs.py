@@ -1,44 +1,43 @@
-def dfs(maze, start, end):
-    stack = [(start, [start])]  # Each element is (position, path_so_far)
-    visited = set()
+from collections import deque
 
-    while stack:
-        position, path = stack.pop()
-        x, y = position
+def bfs(maze, start, end):
+    # Directions: up, right, down, left
+    directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
+    queue = deque([start])  # Queue for BFS
+    visited = set(start)    # Keep track of visited cells
 
-        if position == end:
-            return path  # Return the successful path
+    while queue:
+        current = queue.popleft()
+        if current == end:
+            return True  # Path found to exit
 
-        visited.add(position)
+        for direction in directions:
+            # Calculate the next cell's position
+            next_cell = (current[0] + direction[0], current[1] + direction[1])
 
-        # Explore neighbors (up, down, left, right)
-        for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-            new_x, new_y = x + dx, y + dy
-            new_pos = (new_x, new_y)
+            # Check if the next cell is within the maze and not a wall
+            if (0 <= next_cell[0] < len(maze) and
+                    0 <= next_cell[1] < len(maze[0]) and
+                    maze[next_cell[0]][next_cell[1]] != '#' and
+                    next_cell not in visited):
+                queue.append(next_cell)
+                visited.add(next_cell)
 
-            # Check bounds, walls, and visited
-            if (0 <= new_x < len(maze) and 0 <= new_y < len(maze[0]) and
-                maze[new_x][new_y] == 0 and new_pos not in visited):
-                stack.append((new_pos, path + [new_pos]))
+    return False  # No path found
 
-    return None  # No path found
-
-
-# Example maze: 0 -> open path, 1 -> wall
+# Example maze where '#' is a wall, 'S' is start, and 'E' is end
 maze = [
-    [0, 1, 0, 0, 0],
-    [0, 1, 0, 1, 0],
-    [0, 0, 0, 1, 0],
-    [1, 1, 1, 1, 0],
-    [0, 0, 0, 0, 0]
+    ['S', '.', '.', '#', '.', '.', '.'],
+    ['.', '#', '.', '#', '.', '#', '.'],
+    ['.', '#', '.', '.', '.', '.', '.'],
+    ['.', '.', '#', '#', '#', '.', '.'],
+    ['.', '#', '.', '.', '.', '#', '.'],
+    ['.', '#', '#', '#', '.', '#', '.'],
+    ['.', '.', '.', '.', '.', '.', 'E'],
 ]
 
-start = (0, 2)
-end = (3, 4)
+start = (0, 0)  # Starting position
+end = (4, 4)
 
-path = dfs(maze, start, end)
-if path:
-    print("Path found:", path)
-else:
-    print("No path exists")
-
+# Solve the maze
+print(dfs(maze, start, end)) # Output: True
