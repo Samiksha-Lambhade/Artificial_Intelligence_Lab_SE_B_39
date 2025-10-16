@@ -1,6 +1,6 @@
 from collections import deque
 
-def bfs(maze, start, end):
+def dfs(maze, start, end):
     # Directions: up, right, down, left
     directions = [(-1, 0), (0, 1), (1, 0), (0, -1)]
     queue = deque([start])  # Queue for BFS
